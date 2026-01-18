@@ -57,7 +57,7 @@ internal class UserManager:IEnumerable<User>
             }
         }
 
-        Console.WriteLine("No user found");
+        Console.WriteLine("No user found or invalid password");
         return null;
         
     }
