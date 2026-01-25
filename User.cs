@@ -12,6 +12,8 @@ internal class User
     public string Password { get; set; }
 
     public DateTime Birthday { get; set; }
+    public List<Result> Results { get; set; }
+
 
     public User(string login, string password, DateTime birthday)
     {
@@ -20,11 +22,11 @@ internal class User
         Birthday = birthday;
     }
 
+
     public User()
     {
-
+        Results = new List<Result>();
     }
-
     public override string ToString()
     {
         return $"Login: {Login}, Birthday: {Birthday.ToShortDateString()}";

@@ -4,16 +4,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using System.IO;
 
 namespace ExamProject;
 
 internal class UserManager:IEnumerable<User>
 {
-    private List<User> users = new List<User>();
+    private List<User> users;
+    
+    private const string filePath = "users.json";
 
-    public void AddUser(User user)
+    public UserManager()
     {
-        users.Add(user);
+        if (File.Exists(filePath))
+        {
+            users = DeserializeUsers();
+        }
+        else
+        {
+            users = new List<User>();
+        }
+        
     }
 
     public IEnumerator<User> GetEnumerator()
@@ -43,6 +55,7 @@ internal class UserManager:IEnumerable<User>
         User newUser = new User(log, pas, birthday);
         
         users.Add(newUser);
+        SerializeUsers();
         return true;
     }
 
@@ -61,4 +74,22 @@ internal class UserManager:IEnumerable<User>
         return null;
         
     }
+
+    public void SerializeUsers()
+    {
+        string json = JsonConvert.SerializeObject(users);
+        File.WriteAllText(filePath, json);
+    }
+
+    public List<User> DeserializeUsers()
+    {
+        string data = File.ReadAllText(filePath);
+        List<User>? personsFromJson = JsonConvert.DeserializeObject<List<User>>(data);
+        return personsFromJson == null ? new List<User>() : personsFromJson;    
+    }
+
+    //public void SortUsersResult()
+    //{
+    //    var sorted = users.OrderBy(u => u.Results)
+    //}
 }
