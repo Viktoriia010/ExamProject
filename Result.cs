@@ -9,15 +9,15 @@ namespace ExamProject;
 internal class Result
 {
     public string QuizName { get; set; }      
-    public int CorrectAnswers { get; set; }  
-    public int Place { get; set; }
+    public int CorrectAnswers { get; set; }
     public DateTime Date { get; set; }
 
-    public Result(string quizName, int correctAnswers, int place, DateTime date) 
+    public Result() { }
+
+    public Result(string quizName, int correctAnswers, DateTime date) 
     {
         QuizName = quizName;
         CorrectAnswers = correctAnswers;
-        Place = place;
         Date = date;
 
     }

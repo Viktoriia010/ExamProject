@@ -3,25 +3,30 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+
 
 namespace ExamProject;
 
 internal class Menu
 {
     private readonly UserManager _userManager;
-
-    public Menu(UserManager userManager)
+    private readonly ILogger _logger;
+    public Menu(UserManager userManager, ILogger logger)
     {
         _userManager = userManager;
+        _logger = logger;
     }
-
     public void Run()
     {
         bool isExit = false;
 
         while (!isExit)
         {
-            ShowMainMenu();
+            Console.WriteLine("0 Вихід");
+            Console.WriteLine("1 Увійти");
+            Console.WriteLine("2 Зареєструватись");
+            Console.Write("Введіть число: ");
 
             if (!int.TryParse(Console.ReadLine(), out int choice))
             {
@@ -44,36 +49,29 @@ internal class Menu
                     break;
 
                 default:
-                    Console.WriteLine("Wrong menu option!");
+                    Console.WriteLine("Неправильний пункт меню!");
                     break;
             }
         }
     }
 
-    private void ShowMainMenu()
-    {
-        Console.WriteLine("0 Exit");
-        Console.WriteLine("1 Login");
-        Console.WriteLine("2 Registration");
-        Console.Write("Enter number: ");
-    }
     private void LoginMenu()
     {
-        Console.Write("Enter login: ");
+        Console.Write("Введіть логін: ");
         string? login = Console.ReadLine();
 
         if (string.IsNullOrWhiteSpace(login))
         {
-            Console.WriteLine("Invalid login!");
+            Console.WriteLine("Невірний логін!");
             return;
         }
 
-        Console.Write("Enter password: ");
+        Console.Write("Введіть пароль: ");
         string? password = Console.ReadLine();
 
         if (string.IsNullOrWhiteSpace(password))
         {
-            Console.WriteLine("Invalid password!");
+            Console.WriteLine("Невірний пароль!");
             return;
         }
 
@@ -82,7 +80,7 @@ internal class Menu
 
         if (user == null)
         {
-            Console.WriteLine("Login failed!");
+            Console.WriteLine("Помилка входу!");
             return;
         }
 
@@ -95,12 +93,12 @@ internal class Menu
 
         while (!isExit)
         {
-            Console.WriteLine("0 Exit");
-            Console.WriteLine("1 Start a new quiz");
-            Console.WriteLine("2 View your results");
-            Console.WriteLine("3 View Top 20");
-            Console.WriteLine("4 Change settings");
-            Console.Write("Enter number: ");
+            Console.WriteLine("0 Вихід");
+            Console.WriteLine("1 Почати нову вікторину");
+            Console.WriteLine("2 Переглянути свої результати");
+            Console.WriteLine("3 Переглянути топ-20");
+            Console.WriteLine("4 Змінити налаштування");
+            Console.Write("Введіть число: ");
 
             if (!int.TryParse(Console.ReadLine(), out int choice))
             {
@@ -111,35 +109,28 @@ internal class Menu
             switch (choice)
             {
                 case 0:
+                    _logger.LogInformation("User {Login} selected menu option {Choice}", user.Login, choice);
                     isExit = true;
                     break;
                 case 1:
+                    _logger.LogInformation("User {Login} selected menu option {Choice}", user.Login, choice);
                     QuizMenu(user);
                     break;
                 case 2:
-                    {
-                        var developerGroups = from result in user.Results
-                                              group result by result.QuizName;
-
-                        foreach (var g in developerGroups)
-                        {
-                            Console.WriteLine(g.Key);
-                            foreach (var t in g)
-                                Console.WriteLine($"\t{t.CorrectAnswers}/20, {t.Date}");
-                            Console.WriteLine();
-                        }
-                        Console.WriteLine('\n');
-                    }
+                    _logger.LogInformation("User {Login} selected menu option {Choice}", user.Login, choice);
+                    user.ShowResults();
                     break;
                 case 3:
+                    _logger.LogInformation("User {Login} selected menu option {Choice}", user.Login, choice);
                     ResultsMenu(user);
                     break;
                 case 4:
+                    _logger.LogInformation("User {Login} selected menu option {Choice}", user.Login, choice);
                     SettingsMenu(user);
                     break;
 
                 default:
-                    Console.WriteLine("Option not implemented yet.");
+                    Console.WriteLine("Неправильний пункт меню!");
                     break;
             }
         }
@@ -152,12 +143,12 @@ internal class Menu
         while (!turnBack)
         {
             
-            Console.WriteLine("0 Turn back");
-            Console.WriteLine("1 History quiz");
-            Console.WriteLine("2 Geography quiz");
-            Console.WriteLine("3 Biology quiz");
-            Console.WriteLine("4 Mixed quiz");
-            Console.Write("Enter number: ");
+            Console.WriteLine("0 Повернутись назад");
+            Console.WriteLine("1 Вікторина з історії");
+            Console.WriteLine("2 Вікторина з географії");
+            Console.WriteLine("3 Вікторина з біології");
+            Console.WriteLine("4 Міксована вікторина ");
+            Console.Write("Введіть число: ");
 
             if (!int.TryParse(Console.ReadLine(), out int choice))
             {
@@ -173,107 +164,69 @@ internal class Menu
 
                 case 1:
                     {
-                        Quiz myQuiz = Quiz.DeserializeQuiz("historyTest.json");
+                        _logger.LogInformation("User {Login} started quiz {QuizName}", user.Login, "History");
+                        Quiz myQuiz = new Quiz().DeserializeQuiz("historyTest.json");
                         int res = myQuiz.ShowQuiz();
-                        Console.WriteLine($"Your result: {res}/20 ");
-                        Result result = new Result("History", res, 0, DateTime.Now);
-                        user.Results.Add(result);
+                        _logger.LogInformation("Quiz finished. Result: {Result}/20",res);
+                        Console.WriteLine($"Ваш результат: {res}/20 ");
+                        Result result = new Result("History", res, DateTime.Now);
+                        _userManager.AddResult(user, result);
+                        _userManager.UserPlace(user, "History");
 
                     }
                     break;
 
                 case 2:
                     {
-                       
-                        
+                        _logger.LogInformation("User {Login} started quiz {QuizName}", user.Login, "Geography");
+
+                        Quiz myQuiz = new Quiz().DeserializeQuiz("geographyTest.json");
+                        int res = myQuiz.ShowQuiz();
+                        _logger.LogInformation("Quiz finished. Result: {Result}/20", res);
+                        Console.WriteLine($"Ваш результат: {res}/20 ");
+                        Result result = new Result("Geography", res, DateTime.Now);
+                        _userManager.AddResult(user, result);
+                        _userManager.UserPlace(user, "Geography");
+
                     }
                     break;
 
                 case 3:
                     {
+                        _logger.LogInformation("User {Login} started quiz {QuizName}", user.Login, "Biology");
 
-
+                        Quiz myQuiz = new Quiz().DeserializeQuiz("biologyTest.json");
+                        int res = myQuiz.ShowQuiz();
+                        _logger.LogInformation("Quiz finished. Result: {Result}/20", res);
+                        Console.WriteLine($"Ваш результат: {res}/20 ");
+                        Result result = new Result("Biology", res, DateTime.Now);
+                        _userManager.AddResult(user, result);
+                        _userManager.UserPlace(user, "Biology");
                     }
                     break;
 
                 case 4:
                     {
+                        _logger.LogInformation("User {Login} started quiz {QuizName}", user.Login, "Mixed");
 
+                        Quiz myQuiz = new Quiz().CreateMixedQuiz();
+                        int res = myQuiz.ShowQuiz(true);
+                        _logger.LogInformation("Quiz finished. Result: {Result}/20", res);
+                        Console.WriteLine($"Ваш результат: {res}/20 ");
+                        Result result = new Result("Mixed", res, DateTime.Now);
+                        _userManager.AddResult(user, result);
+                        _userManager.UserPlace(user, "Mixed");
 
                     }
                     break;
 
                 default:
-                    Console.WriteLine("Wrong menu option!");
+                    Console.WriteLine("Неправильний пункт меню!");
                     break;
             }
         }
     }
 
-    //private void MyResultsMenu(User user)
-    //{
-    //    bool turnBack = false;
-
-    //    while (!turnBack)
-    //    {
-
-    //        Console.WriteLine("0 Turn back");
-    //        Console.WriteLine("1 From history quiz");
-    //        Console.WriteLine("2 From geography quiz");
-    //        Console.WriteLine("3 From biology quiz");
-    //        Console.WriteLine("4 From mixed quiz");
-    //        Console.Write("Enter number: ");
-
-    //        if (!int.TryParse(Console.ReadLine(), out int choice))
-    //        {
-    //            Console.WriteLine("Invalid input!");
-    //            continue;
-    //        }
-
-    //        switch (choice)
-    //        {
-    //            case 0:
-    //                turnBack = true;
-    //                break;
-
-    //            case 1:
-    //                {
-    //                    //Quiz myQuiz = Quiz.DeserializeQuiz("historyTest.json");
-    //                    //int res = myQuiz.ShowQuiz();
-    //                    //Console.WriteLine($"Your result: {res}/20 ");
-    //                    //Result result = new Result("History", res, 0);
-    //                    //user.Results.Add(result);
-
-    //                }
-    //                break;
-
-    //            case 2:
-    //                {
-
-
-    //                }
-    //                break;
-
-    //            case 3:
-    //                {
-
-
-    //                }
-    //                break;
-
-    //            case 4:
-    //                {
-
-
-    //                }
-    //                break;
-
-    //            default:
-    //                Console.WriteLine("Wrong menu option!");
-    //                break;
-    //        }
-    //    }
-    //}
     private void ResultsMenu(User user)
     {
         bool turnBack = false;
@@ -281,12 +234,12 @@ internal class Menu
         while (!turnBack)
         {
 
-            Console.WriteLine("0 Turn back");
-            Console.WriteLine("1 From history quiz");
-            Console.WriteLine("2 From geography quiz");
-            Console.WriteLine("3 From biology quiz");
-            Console.WriteLine("4 From mixed quiz");
-            Console.Write("Enter number: ");
+            Console.WriteLine("0 Повернутись назад");
+            Console.WriteLine("1 З історичної вікторини");
+            Console.WriteLine("2 З географічної вікторини");
+            Console.WriteLine("3 З біологічної вікторини");
+            Console.WriteLine("4 З міксованої вікторини");
+            Console.Write("Введіть число: ");
 
             if (!int.TryParse(Console.ReadLine(), out int choice))
             {
@@ -301,39 +254,23 @@ internal class Menu
                     break;
 
                 case 1:
-                    {
-                        //Quiz myQuiz = Quiz.DeserializeQuiz("historyTest.json");
-                        //int res = myQuiz.ShowQuiz();
-                        //Console.WriteLine($"Your result: {res}/20 ");
-                        //Result result = new Result("History", res, 0);
-                        //user.Results.Add(result);
-
-                    }
+                    _userManager.SortUsersByResult("History");
                     break;
 
                 case 2:
-                    {
-
-
-                    }
+                    _userManager.SortUsersByResult("Geography");
                     break;
 
                 case 3:
-                    {
-
-
-                    }
+                     _userManager.SortUsersByResult("Biology");
                     break;
 
                 case 4:
-                    {
-
-
-                    }
+                     _userManager.SortUsersByResult("Mixed");
                     break;
 
                 default:
-                    Console.WriteLine("Wrong menu option!");
+                    Console.WriteLine("Неправильний пункт меню!");
                     break;
             }
         }
@@ -344,10 +281,10 @@ internal class Menu
 
         while (!turnBack)
         {
-            Console.WriteLine("0 Turn back");
-            Console.WriteLine("1 Change password");
-            Console.WriteLine("2 Change birthday");
-            Console.Write("Enter number: ");
+            Console.WriteLine("0 Повернутись назад");
+            Console.WriteLine("1 Змінити пароль");
+            Console.WriteLine("2 Змінити дату народження");
+            Console.Write("Введіть число: ");
 
             if (!int.TryParse(Console.ReadLine(), out int choice))
             {
@@ -362,37 +299,17 @@ internal class Menu
                     break;
 
                 case 1:
-                    {
-                        Console.WriteLine($"Current password: {user.Password}");
-                        Console.Write("Enter new password: ");
-                        user.Password = Console.ReadLine();
-                        Console.WriteLine("Password updated!");
-                        _userManager.SerializeUsers();
-                    }
+                    user.ChangePassword();
+                    _userManager.SerializeUsers();
                     break;
 
                 case 2:
-                    {
-                        Console.WriteLine($"Current birthday: {user.Birthday}");
-
-                        while (true)
-                        {
-                            Console.Write("Enter new birthday: ");
-                            if (DateTime.TryParse(Console.ReadLine(), out DateTime date))
-                            {
-                                user.Birthday = date;
-                                Console.WriteLine("Birthday updated!");
-                                _userManager.SerializeUsers();
-                                return;
-                            }
-
-                            Console.WriteLine("Invalid date format!");
-                        }
-                    }
+                    user.ChangeBirthday();
+                    _userManager.SerializeUsers();
                     break;
 
                 default:
-                    Console.WriteLine("Wrong menu option!");
+                    Console.WriteLine("Неправильний пункт меню!");
                     break;
             }
         }
@@ -403,7 +320,7 @@ internal class Menu
 
         while (true)
         {
-            Console.Write("Enter login: ");
+            Console.Write("Введіть логін: ");
             login = Console.ReadLine();
 
             if (!string.IsNullOrWhiteSpace(login))
@@ -414,7 +331,7 @@ internal class Menu
 
         if (_userManager.IsLoginExists(login))
         {
-            Console.WriteLine("This login already exists!");
+            Console.WriteLine("Такий логін уже існує!");
             return;
         }
 
@@ -422,7 +339,7 @@ internal class Menu
 
         while (true)
         {
-            Console.Write("Enter password: ");
+            Console.Write("Введіть пароль: ");
             password = Console.ReadLine();
 
             if (!string.IsNullOrWhiteSpace(password))
@@ -432,13 +349,13 @@ internal class Menu
         }
 
 
-        Console.Write("Enter birthday: ");
+        Console.Write("Введіть дату народження: ");
         if (!DateTime.TryParse(Console.ReadLine(), out DateTime birthday))
         {
             Console.WriteLine("Invalid date format!");
             return;
         }
 
-        Console.WriteLine(_userManager.Register(login, password, birthday)? "Registration successful!": "Registration failed!");
+        Console.WriteLine(_userManager.Register(login, password, birthday)? "Реєстрація пройшла успішно!": "Реєстрація не пройшла!");
     }
 }

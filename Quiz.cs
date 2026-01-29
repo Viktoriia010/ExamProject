@@ -39,20 +39,28 @@ internal class Quiz
         return result;
     }
 
-    public static Quiz DeserializeQuiz(string path)
+    public Quiz DeserializeQuiz(string path)
     {
         string data = File.ReadAllText(path);
         Quiz? questionFromJson = JsonConvert.DeserializeObject<Quiz>(data);
         return questionFromJson;
     }
 
-    public int ShowQuiz()
+    public int ShowQuiz(bool numberQuestions = false)
     {
         int res = 0;
         foreach (var question in Questions)
         {
-            Console.WriteLine(question);
-            Console.Write("Enter your answer (comma separated): ");
+            if (numberQuestions) 
+            {
+                string cleanQuestion =  question.ToString().Substring(3);
+                Console.WriteLine(cleanQuestion);
+            }
+            else
+            {
+                Console.WriteLine(question);   
+            }
+            Console.Write("Введіть свою відповідь (розділивши її комами): ");
             string? ans = Console.ReadLine();
 
             var userAnswers = ans.Split(',', StringSplitOptions.RemoveEmptyEntries)
@@ -74,5 +82,24 @@ internal class Quiz
         
         return res;
     }
-   
+
+    public Quiz CreateMixedQuiz()
+    {
+        Quiz mixedQuiz = new Quiz("Mixed Quiz");
+
+        Quiz historyQuiz = new Quiz().DeserializeQuiz("historyTest.json");
+        Quiz geographyQuiz = new Quiz().DeserializeQuiz("geographyTest.json");
+        Quiz biologyQuiz = new Quiz().DeserializeQuiz("biologyTest.json");
+
+        // Додаємо всі питання у одну колекцію
+        mixedQuiz.Questions.AddRange(historyQuiz.Questions);
+        mixedQuiz.Questions.AddRange(geographyQuiz.Questions);
+        mixedQuiz.Questions.AddRange(biologyQuiz.Questions);
+
+        Random rnd = new Random();
+        mixedQuiz.Questions = mixedQuiz.Questions.OrderBy(q => rnd.Next()).Take(20).ToList();
+
+        return mixedQuiz;
+    }
+
 }
