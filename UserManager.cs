@@ -10,16 +10,16 @@ using Microsoft.Extensions.Logging;
 
 namespace ExamProject;
 
-internal class UserManager:IEnumerable<User>
+internal class UserManager : IEnumerable<User>
 {
     private List<User> users;
     private ILogger logger;
-    
+
     private const string filePath = "users.json";
 
     public UserManager(ILogger logger)
     {
-        this.logger = logger; 
+        this.logger = logger;
         if (File.Exists(filePath))
         {
             users = DeserializeUsers();
@@ -59,7 +59,7 @@ internal class UserManager:IEnumerable<User>
             return false;
         }
         User newUser = new User(log, pas, birthday);
-        
+
         users.Add(newUser);
         SerializeUsers();
         logger.LogInformation("User registered: {Login}", log);
@@ -82,7 +82,7 @@ internal class UserManager:IEnumerable<User>
         Console.WriteLine("Користувача не знайдено або пароль недійсний");
         logger.LogWarning("Failed login attempt: {Login}", log);
         return null;
-        
+
     }
 
     public void SerializeUsers()
@@ -104,13 +104,13 @@ internal class UserManager:IEnumerable<User>
     {
         string data = File.ReadAllText(filePath);
         List<User>? personsFromJson = JsonConvert.DeserializeObject<List<User>>(data);
-        return personsFromJson == null ? new List<User>() : personsFromJson;    
+        return personsFromJson == null ? new List<User>() : personsFromJson;
     }
     public void AddResult(User user, Result result)
     {
         user.Results.Add(result);
         SerializeUsers();
-        logger.LogInformation("Result added. User: {Login}, Quiz: {Quiz}, Score: {Score}",user.Login,result.QuizName,result.CorrectAnswers);
+        logger.LogInformation("Result added. User: {Login}, Quiz: {Quiz}, Score: {Score}", user.Login, result.QuizName, result.CorrectAnswers);
     }
 
     public void SortUsersByResult(string nameQuiz)
@@ -164,6 +164,6 @@ internal class UserManager:IEnumerable<User>
 
         Console.WriteLine("Ви не увійшли в топ-20.");
         return 0;
-        
+
     }
 }

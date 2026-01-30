@@ -142,7 +142,7 @@ internal class Menu
 
         while (!turnBack)
         {
-            
+
             Console.WriteLine("0 Повернутись назад");
             Console.WriteLine("1 Вікторина з історії");
             Console.WriteLine("2 Вікторина з географії");
@@ -167,7 +167,7 @@ internal class Menu
                         _logger.LogInformation("User {Login} started quiz {QuizName}", user.Login, "History");
                         Quiz myQuiz = new Quiz().DeserializeQuiz("historyTest.json");
                         int res = myQuiz.ShowQuiz();
-                        _logger.LogInformation("Quiz finished. Result: {Result}/20",res);
+                        _logger.LogInformation("Quiz finished. Result: {Result}/20", res);
                         Console.WriteLine($"Ваш результат: {res}/20 ");
                         Result result = new Result("History", res, DateTime.Now);
                         _userManager.AddResult(user, result);
@@ -262,11 +262,11 @@ internal class Menu
                     break;
 
                 case 3:
-                     _userManager.SortUsersByResult("Biology");
+                    _userManager.SortUsersByResult("Biology");
                     break;
 
                 case 4:
-                     _userManager.SortUsersByResult("Mixed");
+                    _userManager.SortUsersByResult("Mixed");
                     break;
 
                 default:
@@ -356,6 +356,6 @@ internal class Menu
             return;
         }
 
-        Console.WriteLine(_userManager.Register(login, password, birthday)? "Реєстрація пройшла успішно!": "Реєстрація не пройшла!");
+        Console.WriteLine(_userManager.Register(login, password, birthday) ? "Реєстрація пройшла успішно!" : "Реєстрація не пройшла!");
     }
 }

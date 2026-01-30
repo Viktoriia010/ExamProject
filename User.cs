@@ -6,25 +6,13 @@ using System.Threading.Tasks;
 
 namespace ExamProject;
 
-internal class User
+internal class User: Person
 {
-    public string Login { get; set; }
-    public string Password { get; set; }
-
-    public DateTime Birthday { get; set; }
+    
     public List<Result> Results { get; set; }
 
 
-    public User(string login, string password, DateTime birthday)
-    {
-        Login = login;
-        Password = password;
-        Birthday = birthday;
-        Results = new List<Result>();
-    }
-
-
-    public User()
+    public User(string login, string password, DateTime birthday) : base(login, password, birthday)
     {
         Results = new List<Result>();
     }
@@ -57,44 +45,5 @@ internal class User
         Console.WriteLine('\n');
     }
 
-    public void ChangePassword()
-    {
-        Console.WriteLine($"Теперішній пароль: {Password}");
-        while (true)
-        {
-            Console.Write("Введіть новий пароль: ");
-            string? password = Console.ReadLine();
-
-            if (string.IsNullOrWhiteSpace(password))
-            {
-                Console.WriteLine("Пароль невалідний!");
-                return;
-            }
-            else
-            {
-                Password = password;
-                break;
-            }
-        }
-
-        Console.WriteLine("Новий пароль збережено!");
-    }
-
-    public void ChangeBirthday()
-    {
-        Console.WriteLine($"Теперішня дата народження: {Birthday}");
-
-        while (true)
-        {
-            Console.Write("Введіть нову дату народження: ");
-            if (DateTime.TryParse(Console.ReadLine(), out DateTime date))
-            {
-                Birthday = date;
-                Console.WriteLine("Нову дату народження збережено!");
-                break;
-            }
-
-            Console.WriteLine("Неправильний формат дати!");
-        }
-    }
+   
 }
