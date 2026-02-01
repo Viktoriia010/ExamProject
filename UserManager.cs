@@ -115,14 +115,15 @@ internal class UserManager : IEnumerable<User>
 
     public void SortUsersByResult(string nameQuiz)
     {
+        // беремо кожен результат кожного користувача з конкретної вікторини, створюємо об'єкт
         var sortedUsers = users
       .SelectMany(u => u.Results
           .Where(r => r.QuizName == nameQuiz)
           .Select(r => new { User = u, Result = r }))
-      .GroupBy(x => x.User.Login)
+      .GroupBy(x => x.User.Login) 
       .Select(g => g
           .OrderByDescending(x => x.Result.Date)
-          .First())
+          .First())// щоб був тільки один результат юзера
       .OrderByDescending(x => x.Result.CorrectAnswers)
       .ThenByDescending(x => x.Result.Date)
       .Take(20);

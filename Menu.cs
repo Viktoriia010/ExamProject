@@ -165,13 +165,13 @@ internal class Menu
                 case 1:
                     {
                         _logger.LogInformation("User {Login} started quiz {QuizName}", user.Login, "History");
-                        Quiz myQuiz = new Quiz().DeserializeQuiz("historyTest.json");
-                        int res = myQuiz.ShowQuiz();
+                        Quiz myQuiz = new Quiz().DeserializeQuiz("historyTest.json"); // десеріалізуємо з файлу вікторину
+                        int res = myQuiz.ShowQuiz(); // проходимо вікторину і повертаємо результат 
                         _logger.LogInformation("Quiz finished. Result: {Result}/20", res);
                         Console.WriteLine($"Ваш результат: {res}/20 ");
                         Result result = new Result("History", res, DateTime.Now);
-                        _userManager.AddResult(user, result);
-                        _userManager.UserPlace(user, "History");
+                        _userManager.AddResult(user, result); // додаємо результат 
+                        _userManager.UserPlace(user, "History"); // місце в таблиці
 
                     }
                     break;
@@ -209,8 +209,8 @@ internal class Menu
                     {
                         _logger.LogInformation("User {Login} started quiz {QuizName}", user.Login, "Mixed");
 
-                        Quiz myQuiz = new Quiz().CreateMixedQuiz();
-                        int res = myQuiz.ShowQuiz(true);
+                        Quiz myQuiz = new Quiz().CreateMixedQuiz(); // створюємо вікторину
+                        int res = myQuiz.ShowQuiz(true); // true - прибераємо нумерацію питань
                         _logger.LogInformation("Quiz finished. Result: {Result}/20", res);
                         Console.WriteLine($"Ваш результат: {res}/20 ");
                         Result result = new Result("Mixed", res, DateTime.Now);

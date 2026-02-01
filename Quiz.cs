@@ -53,7 +53,7 @@ internal class Quiz
         {
             if (numberQuestions) 
             {
-                string cleanQuestion =  question.ToString().Substring(3);
+                string cleanQuestion =  question.ToString().Substring(3); // вирізаємо перші три символи (цифри і крапки), щоб не було нумерації питань
                 Console.WriteLine(cleanQuestion);
             }
             else
@@ -63,11 +63,11 @@ internal class Quiz
             Console.Write("Введіть свою відповідь (розділивши її комами): ");
             string? ans = Console.ReadLine();
 
-            var userAnswers = ans.Split(',', StringSplitOptions.RemoveEmptyEntries)
-                .Select(a => a.Trim())
+            var userAnswers = ans.Split(',', StringSplitOptions.RemoveEmptyEntries)  // створюємо список відповідей користувача, розділяючи елементи через кому, "пусті" елементи прибераємо
+                .Select(a => a.Trim()) // прибераємо пробіли біля елементів
                 .ToList();
 
-            var correctAnswers = question.Answers.Where(a => a.IsCorrect)
+            var correctAnswers = question.Answers.Where(a => a.IsCorrect) 
                 .Select(a => a.Text.Trim()[0].ToString())
                 .ToList();
 

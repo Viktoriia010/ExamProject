@@ -30,8 +30,9 @@ internal class User: Person
             Console.WriteLine("\nРезультатів немає\n");
             return;
         }
-
+        // групуємо результати по вікторинах, нові результати будуть перші
         var groups = from result in Results
+                     orderby result.Date descending
                      group result by result.QuizName;
 
 

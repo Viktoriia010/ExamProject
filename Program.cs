@@ -8,7 +8,7 @@ namespace ExamProject;
 
 internal class Program
 {
-    //"historyTest.json"
+   
     static void Main(string[] args)
     {
         Log.Logger = new LoggerConfiguration()
@@ -25,6 +25,7 @@ internal class Program
         var userManagerLogger = loggerFactory.CreateLogger<UserManager>();
         var menuLogger = loggerFactory.CreateLogger<Menu>();
 
+        // для правильного виводу кирилиці
         Console.OutputEncoding = System.Text.Encoding.UTF8;
 
         UserManager userManager = new UserManager(userManagerLogger);
