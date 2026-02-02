@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace ExamProject;
 
-internal class UserManager : IEnumerable<User>
+internal class UserManager 
 {
     private List<User> users;
     private ILogger logger;
@@ -30,16 +30,6 @@ internal class UserManager : IEnumerable<User>
         }
     }
 
-    public IEnumerator<User> GetEnumerator()
-    {
-        return users.GetEnumerator();
-    }
-
-
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
     public bool IsLoginExists(string login)
     {
         foreach (User user in users)
